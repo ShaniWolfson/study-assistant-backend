@@ -38,7 +38,13 @@ def test_db_connection(db: Session = Depends(get_db)):
             detail=f"Database connection failed: {e}"
         )
 
-app.include_router( # <--- NEW ROUTER INCLUSION
+app.include_router(
+    auth_routers.router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
+
+app.include_router(
     document_routers.router,
     prefix="/documents",
     tags=["Documents"]
