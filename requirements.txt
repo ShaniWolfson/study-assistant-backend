@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+python-dotenv
+passlib[bcrypt]
+python-jose[cryptography] # For JWTs (auth)
+# For AI (choose based on your preference):
+transformers # If using Hugging Face locally
+torch # Required by transformers for PyTorch models
+tensorflow # Required by transformers for TensorFlow models
+openai # If using OpenAI API
+# Optional (for migrations):
+alembic
+# Optional (for async tasks):
+celery
+redis # Celery broker

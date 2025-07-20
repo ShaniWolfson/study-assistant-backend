@@ -1,0 +1,40 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore virtual environment folder
+venv/
+env/
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore Alembic migration files (if generated dynamically)
+migrations/versions/*.py
+
+# Ignore database files (if using SQLite for local development)
+*.sqlite3
+*.db
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Ignore test artifacts
+*.pytest_cache/
+nosetests.xml
+coverage.xml
+*.test
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
