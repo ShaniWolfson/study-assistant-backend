@@ -1,5 +1,6 @@
 # auth/schemas.py
 from pydantic import BaseModel, EmailStr
+from typing import Optional # Add this import
 
 class UserCreate(BaseModel):
     username: str
@@ -14,10 +15,17 @@ class UserResponse(BaseModel):
     class Config: # This tells Pydantic to convert SQLAlchemy objects to Pydantic objects
         from_attributes = True # For Pydantic v2+ (earlier versions used `orm_mode = True`)
 
-# You'd also have models for login, tokens, etc., here later
+# --- User Login ---
+class UserLogin(BaseModel):
+    username: str # Users will log in with username or email, let's keep it simple with username for now
+    password: str
+
+# --- JWT Token Response ---
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str = "bearer" # Default token type
 
+# --- JWT Token Data (Payload) ---
+# This defines the data we expect inside the JWT payload
 class TokenData(BaseModel):
-    username: str | None = None
+    username: Optional[str] = None # Or email, or user_id

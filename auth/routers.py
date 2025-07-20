@@ -1,17 +1,23 @@
 # auth/routers.py
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm # For FastAPI's login form handling
 from sqlalchemy.orm import Session
-from database import get_db # Relative import to get_db from parent directory
-from models import User  # Absolute import for models
-from .schemas import UserResponse, UserCreate, Token  # Absolute import for schemas# from . import service # Will be imported later when you add business logic
-from .utils import get_password_hash  # Absolute import for password hashing utilities  
+from datetime import timedelta # Add this import
+import os
 
-router = APIRouter() # This is your APIRouter instance
+# Import your database, models, schemas, utils, and NEW service.py
+from database import get_db
+from models import User # Only User is directly needed here now
+from .schemas import UserCreate, UserResponse, Token, UserLogin # Add UserLogin and Token
+from .utils import get_password_hash, verify_password # Add verify_password
+from .service import authenticate_user, create_access_token, get_current_user # NEW imports
 
-# Example: User Registration Endpoint
+router = APIRouter()
+
+# User Registration Endpoint (remains mostly the same)
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter( # Using User directly from models
+    db_user = db.query(User).filter(
         (User.email == user.email) | (User.username == user.username)
     ).first()
     if db_user:
@@ -33,16 +39,28 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-# Example: Login Endpoint (we'll expand this with verification and JWT soon)
+# --- Login Endpoint (Now implements actual authentication and JWT generation) ---
 @router.post("/token", response_model=Token)
-def login_for_access_token():
-    # Authentication logic (e.g., OAuth2, JWT) will go here
-    # For now, return dummy token
-    return {"access_token": "dummy_token", "token_type": "bearer"}
-
-@router.get("/me/", response_model=UserResponse)
-def read_users_me(db: Session = Depends(get_db)):
-    user = db.query(User).first()
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), # FastAPI utility for login forms
+    db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    # Access token expires after a configurable time
+    access_token_expires = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)))
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# --- Protected Endpoint (requires a valid JWT to access) ---
+# The `get_current_user` dependency ensures the user is authenticated and active
+@router.get("/me/", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_user)): # Use the dependency!
+    return current_user
