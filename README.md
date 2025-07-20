@@ -33,11 +33,10 @@ This repository contains the backend for the AI-powered Study Assistant, a web a
 ## Technology Stack
 
 * **Language:** Python 3.9+
-* **Web Framework:** FastAPI (recommended for its performance and modern features)
-    * *Alternative:* Flask (if you prefer a micro-framework)
+* **Web Framework:** FastAPI
 * **Database:** PostgreSQL
 * **ORM (Object-Relational Mapper):** SQLAlchemy
-* **Database Migrations:** Alembic (with SQLAlchemy)
+* **Database Migrations:** Alembic
 * **AI Libraries/APIs:**
     * **Hugging Face Transformers:** For local execution of models like T5, BART (summarization, potentially QG).
     * **OpenAI API:** For powerful language models (e.g., GPT-3.5, GPT-4) for summarization, sophisticated question generation, and flashcard extraction.
@@ -60,14 +59,14 @@ Before you begin, ensure you have the following installed:
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/ShaniWolfson/study-assistant-backend.git](https://github.com/ShaniWolfson/study-assistant-backend.git)
+    git clone https://github.com/ShaniWolfson/study-assistant-backend.git
     cd study-assistant-backend
     ```
 
-2.  **Create and activate a virtual environment:**
+2. **Create and activate a virtual environment:**
 
     Using `pipenv` (recommended):
     ```bash
@@ -83,14 +82,14 @@ Before you begin, ensure you have the following installed:
     .\venv\Scripts\activate
     # On macOS/Linux:
     source venv/bin/activate
-    pip install -r requirements.txt # (You'll create this file later)
+    pip install -r requirements.txt
     ```
 
-3.  **Install project dependencies:**
+3. **Install project dependencies:**
     *(If using `pipenv`, this was done by `pipenv install`)*
 
     Create a `requirements.txt` file (if you didn't use pipenv or didn't have one initially) with the following content:
-    ```
+    ```plaintext
     fastapi
     uvicorn[standard]
     sqlalchemy
@@ -98,23 +97,21 @@ Before you begin, ensure you have the following installed:
     python-dotenv
     passlib[bcrypt]
     python-jose[cryptography] # For JWTs (auth)
-    # For AI (choose based on your preference):
     transformers # If using Hugging Face locally
     torch # Required by transformers for PyTorch models
     tensorflow # Required by transformers for TensorFlow models
     openai # If using OpenAI API
-    # Optional (for migrations):
     alembic
-    # Optional (for async tasks):
     celery
     redis # Celery broker
     ```
+
     Then run:
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Set up PostgreSQL:**
+4. **Set up PostgreSQL:**
     * Create a new PostgreSQL user and database for the project.
     * Example (using `psql`):
         ```sql
@@ -146,90 +143,69 @@ OPENAI_API_KEY="your_openai_api_key_here"
 ```
 
 ### Running the Application
+
 Run database migrations (after setting up SQLAlchemy models):
-(This step assumes you've set up Alembic, if not, you'll need to create your tables manually or through SQLAlchemy's create_all() for development.)
-
-Bash
-
+```bash
 alembic upgrade head
+```
+
 Start the FastAPI application:
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+(Assuming your main FastAPI application instance is named `app` in `main.py`.)
 
-Bash
+The backend will typically be running on [http://localhost:8000](http://localhost:8000).
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-(Assuming your main FastAPI application instance is named app in app/main.py)
+## API Endpoints
 
-The backend will typically be running on http://localhost:8000.
+### Authentication
+* **POST /auth/register:** Register a new user.
+* **POST /auth/token:** Get an access token for a user (JWT).
+* **GET /auth/me:** Get current authenticated user's details.
 
-API Endpoints
-(This section will be filled in as you develop your endpoints. Here are examples of what you might include):
+### Documents
+* **POST /documents/:** Upload/paste new text content. (Requires authentication)
+* **GET /documents/:** Get a list of all user's documents. (Requires authentication)
+* **GET /documents/{document_id}:** Get details of a specific document. (Requires authentication)
+* **DELETE /documents/{document_id}:** Delete a document. (Requires authentication)
 
-Authentication
-POST /auth/register: Register a new user.
+### AI Processing
+* **POST /ai/process-document:** Trigger AI processing (summarization, quiz, flashcards) for a document.
+    * Request Body: `{"document_id": int, "generate_summary": bool, "generate_quiz": bool, "generate_flashcards": bool}`
+    * Response: Status of the processing and potentially links to generated content.
+* **GET /documents/{document_id}/summary:** Retrieve the generated summary for a document.
+* **GET /documents/{document_id}/quizzes:** Retrieve quizzes generated from a document.
+* **GET /documents/{document_id}/flashcards:** Retrieve flashcards generated from a document.
 
-POST /auth/token: Get an access token for a user (JWT).
+### Quizzes & Flashcards
+* **GET /quizzes/{quiz_id}:** Get a specific quiz with its questions and options.
+* **POST /quizzes/{quiz_id}/submit-attempt:** Submit a user's quiz attempt.
+* **GET /flashcards/{flashcard_id}:** Get a specific flashcard.
+* **GET /flashcards/:** Get all flashcards generated for the user.
 
-GET /auth/me: Get current authenticated user's details.
+## Database Schema
 
-Documents
-POST /documents/: Upload/paste new text content. (Requires authentication)
+See `models.py` for the SQLAlchemy model definitions, which reflect the database schema.
 
-GET /documents/: Get a list of all user's documents. (Requires authentication)
+## AI Integration
 
-GET /documents/{document_id}: Get details of a specific document. (Requires authentication)
-
-DELETE /documents/{document_id}: Delete a document. (Requires authentication)
-
-AI Processing
-POST /ai/process-document: Trigger AI processing (summarization, quiz, flashcards) for a document.
-
-Request Body: {"document_id": int, "generate_summary": bool, "generate_quiz": bool, "generate_flashcards": bool}
-
-Response: Status of the processing and potentially links to generated content.
-
-GET /documents/{document_id}/summary: Retrieve the generated summary for a document.
-
-GET /documents/{document_id}/quizzes: Retrieve quizzes generated from a document.
-
-GET /documents/{document_id}/flashcards: Retrieve flashcards generated from a document.
-
-Quizzes & Flashcards
-GET /quizzes/{quiz_id}: Get a specific quiz with its questions and options.
-
-POST /quizzes/{quiz_id}/submit-attempt: Submit a user's quiz attempt.
-
-GET /flashcards/{flashcard_id}: Get a specific flashcard.
-
-GET /flashcards/: Get all flashcards generated for the user.
-
-Database Schema
-(This section will contain the actual SQL schema or a visual representation of your database tables, similar to the conceptual one provided previously.)
-
-See app/models.py (or equivalent) for the SQLAlchemy model definitions, which reflect the database schema.
-
-AI Integration
 The core AI functionality is handled within the backend. Depending on the chosen approach:
-
-Hugging Face Transformers: Models are loaded and run locally on the server. This offers privacy and no per-request cost but requires more computational resources on your server.
-
-OpenAI API: API calls are made to OpenAI's cloud services. This simplifies setup and scales well but incurs API usage costs.
+* **Hugging Face Transformers:** Models are loaded and run locally on the server. This offers privacy and no per-request cost but requires more computational resources on your server.
+* **OpenAI API:** API calls are made to OpenAI's cloud services. This simplifies setup and scales well but incurs API usage costs.
 
 Prompt engineering will be crucial for effective question and flashcard generation using Large Language Models (LLMs). The backend handles crafting these prompts and parsing the AI's responses.
 
-Contributing
+## Contributing
+
 Contributions are welcome! If you have suggestions or want to improve the project, please follow these steps:
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature-name`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add new feature'`).
+5. Push to the branch (`git push origin feature/your-feature-name`).
+6. Open a Pull Request.
 
-Fork the repository.
+## License
 
-Create a new branch (git checkout -b feature/your-feature-name).
-
-Make your changes.
-
-Commit your changes (git commit -m 'Add new feature').
-
-Push to the branch (git push origin feature/your-feature-name).
-
-Open a Pull Request.
-
-License
 This project is licensed under the MIT License - see the LICENSE file for details.

@@ -4,6 +4,7 @@ sqlalchemy
 psycopg2-binary
 python-dotenv
 passlib[bcrypt]
+pydantic
 python-jose[cryptography] # For JWTs (auth)
 # For AI (choose based on your preference):
 transformers # If using Hugging Face locally

@@ -43,6 +43,6 @@ coverage.xml
 Thumbs.db
 
 #ignore test_ files
+test/
 test_*.py
 
-test/
