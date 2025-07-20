@@ -143,7 +143,9 @@ OPENAI_API_KEY="your_openai_api_key_here"
 # HF_MODEL_NAME="t5-small"
 # HF_SUMMARIZATION_MODEL="t5-base"
 # HF_QUESTION_GENERATION_MODEL="t5-base-qa" # Example, you'll pick a real one
-Running the Application
+```
+
+### Running the Application
 Run database migrations (after setting up SQLAlchemy models):
 (This step assumes you've set up Alembic, if not, you'll need to create your tables manually or through SQLAlchemy's create_all() for development.)
 

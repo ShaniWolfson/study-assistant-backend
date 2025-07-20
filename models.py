@@ -2,8 +2,7 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func # For timestamps
-from .database import Base # Import Base from your database.py
-
+from database import Base  # Use absolute import instead of relative
 # User Model
 class User(Base):
     __tablename__ = "users"

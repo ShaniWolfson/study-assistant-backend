@@ -41,3 +41,8 @@ coverage.xml
 *.swo
 .DS_Store
 Thumbs.db
+
+#ignore test_ files
+test_*.py
+
+test/

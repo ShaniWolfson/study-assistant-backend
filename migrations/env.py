@@ -1,8 +1,17 @@
 import os
+import sys
 from dotenv import load_dotenv
 
+# Add the parent directory (your project root) to the Python path
+# This allows absolute imports for modules in the root, like 'database' and 'models'
+parent_dir = os.path.abspath(os.path.join(os.getcwd(), "."))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
 # Load environment variables (important for Alembic to find DATABASE_URL)
-load_dotenv(dotenv_path="/study-assistant-backend/.env")
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+print("Path for .env found: ",  os.path.join(os.path.dirname(__file__), "../.env"))
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
