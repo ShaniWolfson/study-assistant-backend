@@ -1,7 +1,3 @@
-Got it! Here's the README.md content formatted as a proper Markdown file. You can simply copy and paste this directly into a file named README.md in the root of your study-assistant-backend repository.
-
-Markdown
-
 # Study Assistant Backend
 
 This repository contains the backend for the AI-powered Study Assistant, a web application designed to help users learn by summarizing text, generating quizzes, and creating flashcards from their study materials.
