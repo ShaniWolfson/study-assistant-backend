@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import uvicorn
 import os
 from dotenv import load_dotenv
+from ai_processing import routers as ai_processing_routers
 
 # Load environment variables (ensure this is at the top)
 load_dotenv()
@@ -38,6 +39,7 @@ def test_db_connection(db: Session = Depends(get_db)):
             detail=f"Database connection failed: {e}"
         )
 
+# Include your API Routers
 app.include_router(
     auth_routers.router,
     prefix="/auth",
@@ -48,6 +50,12 @@ app.include_router(
     document_routers.router,
     prefix="/documents",
     tags=["Documents"]
+)
+
+app.include_router(
+    ai_processing_routers.router,
+    prefix="/ai",
+    tags=["AI Processing"]
 )
 
 # Optional: Run the app directly for development

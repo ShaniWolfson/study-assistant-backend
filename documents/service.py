@@ -1,7 +1,15 @@
-# documents/service.py
+# ai_processing/service.py
+import os
+from openai import OpenAI
 from sqlalchemy.orm import Session
-from models import Document # Import models from parent directory
-from .schemas import DocumentCreate, DocumentUpdate # Import schemas from current package
+from fastapi import HTTPException, status # Make sure these are imported for the service layer
+
+from models import Document
+from documents import service as document_service
+from .schemas import DocumentCreate, DocumentUpdate
+
+client = OpenAI()
+
 
 def create_user_document(db: Session, document: DocumentCreate, user_id: int):
     """

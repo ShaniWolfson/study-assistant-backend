@@ -15,12 +15,6 @@ from models import User
 from auth import schemas
 from auth.utils import verify_password # Import password verification utility
 
-# Load environment variables
-# This will be done in main.py, but for services that might be run independently,
-# it's good practice to have it here too, or ensure it's loaded globally.
-# from dotenv import load_dotenv
-# load_dotenv()
-
 # Get JWT configuration from environment variables
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256") # Default to HS256 if not set
@@ -72,6 +66,6 @@ def authenticate_user(db: Session, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
     if not user:
         return False
-    if not verify_password(password, user.password_hash):
+    if not verify_password(password, user.hashed_password):
         return False
     return user
